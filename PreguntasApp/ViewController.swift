@@ -21,6 +21,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var btnStartGame: UIButton!
     @IBOutlet weak var lblResult: UILabel!
     var versionMayorIOS8 : Bool = false
+    var numPasoPregunta : Int = 0
     var preguntasCorrectas : Int = 0
     //var preguntasJuego :[(name: String, value: Int)] = []
     /********************************************************
@@ -43,24 +44,11 @@ class ViewController: UIViewController {
         lblResult.alpha = 0
     }
     
-    @objc func versionHigherThan8(){
-        generadorDePreguntas()
-    }
-    @objc func versionLowerThan8(){
-        
-    }
-    
-    func preparaYMuestraPregunta(){
-        
-    }
-    
-    func generadorDePreguntas()
-    {
-        
+    func preparaYMuestraPregunta(numPregunta : Int){
         let alertController = UIAlertController(title: "\n\n\n", message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         
         let margin:CGFloat = 2.0
-
+        
         let lblTitle = UILabel(frame: CGRect(x: margin, y: margin, width: alertController.view.bounds.size.width - margin * 4.0, height: 100.0))
         lblTitle.textAlignment = .center
         lblTitle.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
@@ -68,42 +56,55 @@ class ViewController: UIViewController {
         let lblQuestion = UILabel(frame: CGRect(x: margin, y: margin+25, width: alertController.view.bounds.size.width - margin * 4.0, height: 100.0))
         lblQuestion.font = UIFont(name: "Helvetica", size: 15)
         lblQuestion.textAlignment = .center
-
-        preparaYMuestraPregunta(0)
-        var txtTituloPregunta = "Pregunta 1"
-        var txtPregunta = "¿Cuál es la moneda oficial de España?"
         
-        lblTitle.text = txtTituloPregunta
-        lblQuestion.text = txtPregunta
-    
+        lblTitle.text = "Pregunta \(self.numPasoPregunta+1)"
+        lblQuestion.text = self.preguntas[self.numPasoPregunta].titulo
+        
         alertController.view.addSubview(lblTitle)
         alertController.view.addSubview(lblQuestion)
         
-        let somethingAction = UIAlertAction(title: "Opcion1", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in print("opcion1")
+        let somethingAction = UIAlertAction(title: self.preguntas[self.numPasoPregunta].respuesta1, style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in self.sumaRespuestaCorrecta(respuesta: self.preguntas[self.numPasoPregunta].respuestaCorrecta==1)
         })
-        let somethingAction2 = UIAlertAction(title: "Opcion2", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in print("Opcion2")
+        let somethingAction2 = UIAlertAction(title: self.preguntas[self.numPasoPregunta].respuesta2, style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in self.sumaRespuestaCorrecta(respuesta: self.preguntas[self.numPasoPregunta].respuestaCorrecta==2)
         })
-        let somethingAction3 = UIAlertAction(title: "Opcion3", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in print("opcion3")
+        let somethingAction3 = UIAlertAction(title: self.preguntas[self.numPasoPregunta].respuesta3, style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in self.sumaRespuestaCorrecta(respuesta: self.preguntas[self.numPasoPregunta].respuestaCorrecta==3)
         })
-        let somethingAction4 = UIAlertAction(title: "Opcion4", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in print("opcion4")
+        let somethingAction4 = UIAlertAction(title:self.preguntas[self.numPasoPregunta].respuesta4, style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in self.sumaRespuestaCorrecta(respuesta: self.preguntas[self.numPasoPregunta].respuestaCorrecta==4)
         })
-
+        
         alertController.addAction(somethingAction)
         alertController.addAction(somethingAction2)
         alertController.addAction(somethingAction3)
         alertController.addAction(somethingAction4)
         
         self.present(alertController, animated: true, completion:{})
+    }
     
+    func generadorDePreguntas()
+    {
+        preparaYMuestraPregunta(numPregunta: self.numPasoPregunta)
+    }
+    
+    func sumaRespuestaCorrecta(respuesta : Bool){
+        if (respuesta){
+            self.preguntasCorrectas += 1
+        }
+        self.numPasoPregunta += 1
+        if (self.numPasoPregunta>=4){
+            lblResult.alpha = 1
+        }
+        else{
+            preparaYMuestraPregunta(numPregunta: self.numPasoPregunta)
+        }
+       
     }
     
     @IBAction func btnStartGame(_ sender: UIButton) {
         btnStartGame.alpha = 0
         if (self.versionMayorIOS8){
-            popUpController()
+            generadorDePreguntas()
         }
-        
-        //lblResult.alpha = 1
+
     }
 
     override func viewDidAppear(_ animated: Bool) {
